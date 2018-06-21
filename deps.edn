@@ -1,0 +1,6 @@
+{:deps
+ {org.clojure/clojure {:mvn/version "1.9.0"}
+  org.nfrac/bok.cljplayer {:git/url "https://github.com/floybix/bok"
+                           :deps/root "players/clojure"
+                           :sha "9bc26e79de189a73a2c467fcc200518535084eed"}
+  org.nfrac/gpai {:local/root "../gpai"}}}
