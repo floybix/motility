@@ -1,6 +1,17 @@
 {:deps
  {org.clojure/clojure {:mvn/version "1.9.0"}
-  org.nfrac/bok.cljplayer {:git/url "https://github.com/floybix/bok"
+  org.nfrac/bok.cljplayer {:local/root "../bok/players/clojure"
+                                        ;:git/url "https://github.com/floybix/bok"
                            :deps/root "players/clojure"
-                           :sha "9bc26e79de189a73a2c467fcc200518535084eed"}
-  org.nfrac/gpai {:local/root "../gpai"}}}
+                           :sha "c275e57bc3e81a25a836c94f331e5ca62d1eaa87"}
+  org.nfrac/gpai {:local/root "../gpai"}
+  org.nfrac/cppn {:local/root "../cppn"
+                                        ;:git/url "https://github.com/floybix/cppn"
+                  :sha "4617a417dd4dd7da4220537bec50ea1199188346"}
+  }
+ :aliases
+ {:dev {:extra-deps
+        {org.nfrac/bok {:local/root "../bok/runner"
+                                        ;:git/url "https://github.com/floybix/bok"
+                        :deps/root "runner"
+                        :sha "c275e57bc3e81a25a836c94f331e5ca62d1eaa87"}}}}}
