@@ -1,9 +1,9 @@
-(ns org.nfrac.motility.run
+(ns org.nfrac.motility.cgp
   (:require (org.nfrac.gpai [lang-float :as langf]
                             [cgp :as cgp]
                             [evolution :as evo])
             [clojure.data.generators :as gen]
-            [org.nfrac.bok.cljplayer :refer [send-msg recv-msg patch]]
+            [org.nfrac.bok.cljplayer :as cljplayer]
             [clojure.pprint :as pp])
   (:import [org.zeromq ZMQ]))
 
@@ -30,7 +30,7 @@
      bw-yo bw-xo
      a1-speed a2-speed
      b1-speed b2-speed
-     a2-norm-imp aw-norm-imp 
+     a2-norm-imp aw-norm-imp
      b2-norm-imp bw-norm-imp
      t-sin t-cos
      ;; TODO time signals - sine waves?
@@ -94,38 +94,6 @@
        t-cos (Math/cos time)
        ))))
 
-(defn run-one-bout
-  "Returns the final result of the bout."
-  [socket action-fn peek-ref]
-  (loop []
-    (let [msg (recv-msg socket)
-          bouts peek-ref]
-      (case (:type msg)
-        :identify (send-msg socket {:type :ident
-                                    :data ident})
-        :invite (let [bout-id (:bout-id msg)]
-                  (send-msg socket {:type :join
-                                    :bout-id bout-id})
-                  (swap! bouts assoc bout-id {}))
-        :react (let [bout-id (:bout-id msg)
-                     last-state (@bouts bout-id)
-                     state (-> last-state
-                               (update-in [:current]
-                                          patch (:data msg))
-                               (action-fn))
-                     actions (:actions state)]
-                 (send-msg socket {:type :actions
-                                   :data actions})
-                 (swap! bouts assoc bout-id state))
-        :final-result (let [bout-id (:bout-id msg)]
-                        (send-msg socket {:type :bye})
-                        (swap! bouts dissoc bout-id))
-        (println "Unrecognised message type:" msg))
-      (if (= :final-result (:type msg))
-        (:data msg)
-        (recur)))))
-
-
 (defn bok-alti-fitness
   "Take a CGP genome and return height achieved in bok mayan altitude game."
   [gm socket peek-ref]
@@ -137,7 +105,7 @@
                              {:joint-torques
                               (zipmap output-joints outvals)
                               :raycast raycast-angles})))]
-    (-> (run-one-bout socket action-fn peek-ref)
+    (-> (cljplayer/run-one-bout socket ident action-fn peek-ref)
         :heights
         :player-a
         (or -100))))
